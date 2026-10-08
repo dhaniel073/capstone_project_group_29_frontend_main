@@ -31,6 +31,8 @@ export default function Checkout() {
   const [paying, setPaying] = useState(false);
   const [error, setError] = useState("");
   const [paidRef, setPaidRef] = useState("");
+  const [deliveryAddress, setDeliveryAddress] = useState(user?.address || "");
+const [addressError, setAddressError] = useState("");
 
   useEffect(() => {
     refreshCart();
@@ -42,7 +44,14 @@ export default function Checkout() {
   const total = subtotal + deliveryFee;
 
   const handlePay = async () => {
-    if (paying || total === 0) return;
+    if (paying || total === 0 || loading) return;
+
+    if (!deliveryAddress.trim()) {
+      setAddressError("Please enter your delivery address.");
+      return;
+    }
+
+    setAddressError("");
     setError("");
     setPaidRef("");
     setPaying(true);
@@ -60,7 +69,7 @@ export default function Checkout() {
         onSuccess: (transaction) => {
           const reference = transaction?.reference;
           // Backend re-verifies status, amount and currency with Paystack
-          checkoutApi(reference)
+          checkoutApi(reference, deliveryAddress.trim())
             .then((res) =>
               navigate(`/confirmation/${res.data._id}`, { state: { order: res.data } }),
             )
@@ -105,12 +114,65 @@ export default function Checkout() {
         ) : (
           <div className="split-layout">
             <div className="split-main">
-              <div className="card" style={{ padding: "1.3rem", marginBottom: "1.2rem" }}>
+              <div
+                className="card"
+                style={{ padding: "1.3rem", marginBottom: "1.2rem" }}
+              >
                 <h3 style={{ marginTop: 0 }}>Delivery Address</h3>
-                <p style={{ fontWeight: 700, margin: "0 0 0.2rem" }}>{user?.name}</p>
-                <p className="text-mid" style={{ margin: 0 }}>
-                  {user?.address || "12 Tanke Street, Ilorin, Kwara State"}
+
+                <p style={{ fontWeight: 700, margin: "0 0 0.8rem" }}>
+                  {user?.name}
                 </p>
+
+                <label
+                  htmlFor="deliveryAddress"
+                  style={{
+                    display: "block",
+                    fontSize: "0.85rem",
+                    marginBottom: "0.4rem",
+                  }}
+                >
+                  Where should we deliver your order?
+                </label>
+
+                <textarea
+                  id="deliveryAddress"
+                  name="deliveryAddress"
+                  value={deliveryAddress}
+                  onChange={(e) => {
+                    setDeliveryAddress(e.target.value);
+                    setAddressError("");
+                  }}
+                  placeholder="Enter your house number, street, area, city and state"
+                  rows={4}
+                  required
+                  disabled={paying}
+                  aria-invalid={Boolean(addressError)}
+                  aria-describedby={addressError ? "deliveryAddressError" : undefined}
+                  style={{
+                    width: "100%",
+                    padding: "0.8rem",
+                    border: addressError
+                      ? "1px solid var(--color-danger, #dc2626)"
+                      : "1px solid var(--color-border)",
+                    borderRadius: "8px",
+                    fontFamily: "inherit",
+                    fontSize: "0.9rem",
+                    boxSizing: "border-box",
+                    resize: "vertical",
+                  }}
+                />
+
+                {addressError && (
+                  <p
+                    id="deliveryAddressError"
+                    className="text-danger"
+                    role="alert"
+                    style={{ margin: "0.4rem 0 0", fontSize: "0.85rem" }}
+                  >
+                    {addressError}
+                  </p>
+                )}
               </div>
               <div className="card" style={{ padding: "1.3rem", border: "2px solid var(--color-primary)" }}>
                 <h3 style={{ marginTop: 0 }}>Payment Method</h3>
