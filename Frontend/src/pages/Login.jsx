@@ -3,6 +3,7 @@ import { Link, useNavigate, useLocation } from "react-router";
 import { useAuth } from "../context/AuthContext";
 import Input from "../components/Input";
 import Button from "../components/Button";
+import { Eye, EyeOff } from "lucide-react";
 
 export default function Login() {
   const { login } = useAuth();
@@ -11,6 +12,7 @@ export default function Login() {
   const [form, setForm] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault(); setError(""); setLoading(true);
@@ -32,7 +34,38 @@ export default function Login() {
           <p className="text-mid" style={{ marginBottom: "1.5rem" }}>Log in to continue shopping</p>
           {error && <p className="text-danger">{error}</p>}
           <Input label="Email address" type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required placeholder="Enter your email address" />
-          <Input label="Password" type="password" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} required placeholder="Enter your password" />
+          <Input label="Password" type={showPassword ? "text" : "password"} value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} required placeholder="Enter your password"
+            rightElement={
+              <button
+                type="button"
+                className="password-toggle"
+                onClick={() =>
+                  setShowPassword((current) => !current)
+                }
+                aria-label={
+                  showPassword ? "Hide password" : "Show password"
+                }
+                aria-controls="admin-login-password"
+                title={
+                  showPassword ? "Hide password" : "Show password"
+                }
+              >
+                {showPassword ? (
+                  <EyeOff
+                    size={20}
+                    strokeWidth={2}
+                    aria-hidden="true"
+                  />
+                ) : (
+                  <Eye
+                    size={20}
+                    strokeWidth={2}
+                    aria-hidden="true"
+                  />
+                )}
+              </button>
+            }
+          />
           <div style={{ textAlign: "right", marginBottom: "1rem" }}><Link to="/forgot-password" style={{ color: "var(--color-primary-dark)", fontSize: "0.85rem", fontWeight: 600 }}>Forgot Password?</Link></div>
           <Button type="submit" className="btn-block" loading={loading}>Log In</Button>
           <p style={{ textAlign: "center", marginTop: "1rem" }}>Don't have an account? <Link to="/register" style={{ color: "var(--color-primary-dark)", fontWeight: 700 }}>Sign Up</Link></p>

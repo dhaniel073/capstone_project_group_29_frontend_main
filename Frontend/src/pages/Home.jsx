@@ -36,16 +36,33 @@ export default function Home() {
     if (debouncedSearch) params.search = debouncedSearch;
 
     const request = activeCategory
-      ? getProductsByCategory(activeCategory, params)
+      ? getProductsByCategory(activeCategory)
       : getProducts(params);
 
     request
       .then((res) => {
         if (!active) return;
-        const list = Array.isArray(res.data) ? res.data : [];
+
+        const payload = res.data?.data ?? res.data;
+
+        const list = Array.isArray(payload)
+          ? payload
+          : Array.isArray(payload?.products)
+            ? payload.products
+            : null;
+
+        if (!list) {
+          throw new Error("Unexpected products response format.");
+        }
+
         const onlyThisCategory = activeCategory
-          ? list.filter((p) => String(p.category?._id || p.category) === String(activeCategory))
+          ? list.filter(
+            (p) =>
+              String(p.category?._id || p.category) ===
+              String(activeCategory)
+          )
           : list;
+
         setProducts(onlyThisCategory);
       })
       .catch((err) => {
