@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router";
+import { Routes, Route, Navigate } from "react-router";
 import Home from "./pages/Home";
 import Register from "./pages/Register";
 import Login from "./pages/Login";
@@ -16,6 +16,11 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminProducts from "./pages/admin/AdminProducts";
 import AdminOrders from "./pages/admin/AdminOrders";
 import AdminProductCategory from "./pages/admin/AdminProductCategory"
+import AdminForgotPassword from "./pages/admin/AdminForgotPassword";
+import AdminResetPassword from "./pages/admin/AdminResetPassword";
+import AdminRoute from "./components/AdminRoute";
+import NotFound from "./pages/NotFound";
+
 const auth = (el) => <ProtectedRoute>{el}</ProtectedRoute>;
 const admin = (el) => <ProtectedRoute adminOnly>{el}</ProtectedRoute>;
 
@@ -33,11 +38,19 @@ export default function App() {
       <Route path="/checkout" element={auth(<Checkout />)} />
       <Route path="/confirmation/:id" element={auth(<Confirmation />)} />
       <Route path="/orders" element={auth(<Orders />)} />
+
+      {/* Public admin pages */}
+      <Route path="*" element={<NotFound />} />
       <Route path="/admin/login" element={<AdminLogin />} />
-      <Route path="/admin/dashboard" element={admin(<AdminDashboard />)} />
-      <Route path="/admin/products" element={admin(<AdminProducts />)} />
-      <Route path="/admin/productcategory" element={admin(<AdminProductCategory />)} />
-      <Route path="/admin/orders" element={admin(<AdminOrders />)} />
+      <Route path="/admin/forgot-password" element={<AdminForgotPassword />} />
+      <Route path="/admin/reset-password" element={<AdminResetPassword />} />
+      <Route path="/admin" element={<Navigate to="/admin/login" replace />} />
+
+      <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
+      <Route path="/admin/dashboard" element={<AdminDashboard />} />
+      <Route path="/admin/products" element={<AdminProducts />} />
+      <Route path="/admin/productcategory" element={<AdminProductCategory />} />
+      <Route path="/admin/orders" element={<AdminOrders />} />
     </Routes>
   );
 }

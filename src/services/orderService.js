@@ -1,6 +1,6 @@
 import api from "./api";
 
-export const checkout = (reference) => api.post("/checkout", { reference });
+export const checkout = (reference, deliveryAddress) =>  api.post("/checkout", {reference, deliveryAddress,});
 export const initializeCheckout = () => api.post(`/checkout/init`);
 export const getMyOrders = () => api.get("/orders");
 export const getOrderById = (id) => api.get(`/orders/${id}`);
